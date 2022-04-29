@@ -7,6 +7,8 @@ on:
     tags:
       - 'v*'
 
+permissions: write-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,4 +30,4 @@ jobs:
           echo "TAG: $TAG"
           gh release create "$TAG" package.zip --generate-notes
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
