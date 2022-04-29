@@ -28,4 +28,4 @@ jobs:
           echo "TAG: $TAG"
           gh release create "$TAG" package.zip --generate-notes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
