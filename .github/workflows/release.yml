@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.15.9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.19.0"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and package extension
+        run: pnpm package
+
+      - name: Get version from manifest.json
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' dist/manifest.json)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Version: ${VERSION}"
+
+      - name: Create release package
+        run: |
+          # Rename the package.zip created by pnpm package
+          mv package.zip github-pr-ci-skip-toggle-checkbox-v${{ steps.version.outputs.version }}.zip
+
+          # Create a source code archive
+          zip -r github-pr-ci-skip-toggle-checkbox-source-v${{ steps.version.outputs.version }}.zip . \
+            -x "*.git*" \
+            -x "*node_modules*" \
+            -x "*release-package*" \
+            -x "*.zip"
+
+      - name: Generate release notes
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, generating notes from beginning"
+            NOTES=$(gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/${{ github.repository }}/releases/generate-notes \
+              -f tag_name="${{ github.ref_name }}" \
+              -f target_commitish="${{ github.sha }}" | jq -r '.body')
+          else
+            echo "Generating notes from ${PREVIOUS_TAG} to ${{ github.ref_name }}"
+            NOTES=$(gh api \
+              --method POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              /repos/${{ github.repository }}/releases/generate-notes \
+              -f tag_name="${{ github.ref_name }}" \
+              -f target_commitish="${{ github.sha }}" \
+              -f previous_tag_name="${PREVIOUS_TAG}" | jq -r '.body')
+          fi
+
+          # Save notes to file for the release
+          echo "${NOTES}" > release_notes.md
+          echo "Release notes generated successfully"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "Release ${{ github.ref_name }}" \
+            --notes-file release_notes.md \
+            github-pr-ci-skip-toggle-checkbox-v${{ steps.version.outputs.version }}.zip \
+            github-pr-ci-skip-toggle-checkbox-source-v${{ steps.version.outputs.version }}.zip
+
+      - name: Upload Release Assets Summary
+        run: |
+          {
+            echo "### 📦 Release Created Successfully!"
+            echo ""
+            echo "**Version:** v${{ steps.version.outputs.version }}"
+            echo "**Tag:** ${{ github.ref_name }}"
+            echo ""
+            echo "**Assets:**"
+            echo "- \`github-pr-ci-skip-toggle-checkbox-v${{ steps.version.outputs.version }}.zip\` - Chrome Extension package"
+            echo "- \`github-pr-ci-skip-toggle-checkbox-source-v${{ steps.version.outputs.version }}.zip\` - Source code"
+          } >> "$GITHUB_STEP_SUMMARY"
