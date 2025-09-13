@@ -15,7 +15,7 @@
     "vitest": "3.2.4"
   },
   "name": "github-pr-ci-skip-toggle-checkbox",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "repository": "https://github.com/mkusaka/github-pr-ci-skip-toggle-checkbox.git",
   "author": "mkusaka <hinoshita1992@gmail.com>",
