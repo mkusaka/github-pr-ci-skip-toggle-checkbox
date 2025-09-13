@@ -4,7 +4,8 @@ import packageJson from "../package.json";
 export default defineManifest({
   name: "github-pr-ci-skip-toggle-checkbox",
   version: packageJson.version,
-  description: "Adds checkbox near to PR merge button for easy adds [ci skip] comment to merge title.",
+  description:
+    "Adds checkbox near to PR merge button for easy adds [ci skip] comment to merge title.",
   manifest_version: 3,
   content_scripts: [
     {

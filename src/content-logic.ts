@@ -135,7 +135,7 @@ export const appender = () => {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.id = "skip_ci_checkbox";
-    checkbox.checked = false;  // Default to unchecked - user chooses when to add [ci skip]
+    checkbox.checked = false; // Default to unchecked - user chooses when to add [ci skip]
     checkbox.onchange = (checked) => {
       if ((checked.currentTarget as HTMLInputElement).checked) {
         // Remove any existing [ci skip] or [skip ci] tags

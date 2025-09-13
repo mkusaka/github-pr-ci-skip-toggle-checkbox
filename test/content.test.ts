@@ -18,9 +18,7 @@ describe("Content Script", () => {
 
       const input = getCommitInput();
       // Should remain unchanged - no automatic [ci skip] added
-      expect(input).toHaveValue(
-        "Merge pull request #123 from user/branch",
-      );
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
     });
 
     it("should create CI Skip button with checkbox", () => {
@@ -95,21 +93,19 @@ describe("Content Script", () => {
 
       // Initial state - unchecked without [ci skip]
       expect(checkbox).not.toBeChecked();
-      expect(input).toHaveValue(
-        "Merge pull request #123 from user/branch",
-      );
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
 
       // Check - adds [ci skip]
       await user.click(checkbox);
       expect(checkbox).toBeChecked();
-      expect(input).toHaveValue("[ci skip] Merge pull request #123 from user/branch");
+      expect(input).toHaveValue(
+        "[ci skip] Merge pull request #123 from user/branch",
+      );
 
       // Uncheck again - removes [ci skip]
       await user.click(checkbox);
       expect(checkbox).not.toBeChecked();
-      expect(input).toHaveValue(
-        "Merge pull request #123 from user/branch",
-      );
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
     });
 
     it("should handle clicking the button (not checkbox) correctly", async () => {
@@ -137,9 +133,7 @@ describe("Content Script", () => {
       appender();
 
       const input = screen.getByLabelText("Commit message") as HTMLInputElement;
-      expect(input).toHaveValue(
-        "Merge pull request #123 from user/branch",
-      );
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
 
       // Clean up for next test
       document.body.innerHTML = "";
@@ -173,9 +167,7 @@ describe("Content Script", () => {
 
       // Verify appender was called by checking its effects
       const input = screen.getByLabelText("Commit message") as HTMLInputElement;
-      expect(input).toHaveValue(
-        "Merge pull request #123 from user/branch",
-      );
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
     });
 
     it("should setup observer when PR title field does not exist on PR page", () => {
@@ -243,9 +235,7 @@ describe("Content Script", () => {
 
       // Verify the input was NOT automatically updated
       const input = screen.getByLabelText("Commit message") as HTMLInputElement;
-      expect(input).toHaveValue(
-        "Merge pull request #123 from user/branch",
-      );
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
     });
 
     it("should handle document.body not being ready", () => {
