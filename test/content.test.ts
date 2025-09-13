@@ -11,14 +11,15 @@ import { setupGitHubPRPage, createGitHubMergeDialog } from "./test-utils";
 
 describe("Content Script", () => {
   describe("appender", () => {
-    it("should add [ci skip] to PR title when field exists", () => {
+    it("should NOT automatically add [ci skip] to PR title", () => {
       const { getCommitInput } = setupGitHubPRPage();
 
       appender();
 
       const input = getCommitInput();
+      // Should remain unchanged - no automatic [ci skip] added
       expect(input).toHaveValue(
-        "[ci skip] Merge pull request #123 from user/branch",
+        "Merge pull request #123 from user/branch",
       );
     });
 
@@ -35,7 +36,7 @@ describe("Content Script", () => {
       // Check checkbox exists inside button
       const checkbox = screen.getByRole("checkbox");
       expect(checkbox).toBeInTheDocument();
-      expect(checkbox).toBeChecked();
+      expect(checkbox).not.toBeChecked(); // Default to unchecked
     });
 
     it("should position CI Skip button after Cancel button", () => {
@@ -80,7 +81,7 @@ describe("Content Script", () => {
 
       // Should be the same element
       expect(firstCheckbox).toBe(secondCheckbox);
-      expect(secondCheckbox).toBeChecked();
+      expect(secondCheckbox).not.toBeChecked();
     });
 
     it("should handle checkbox toggle correctly", async () => {
@@ -92,22 +93,22 @@ describe("Content Script", () => {
       const checkbox = screen.getByRole("checkbox");
       const input = getCommitInput();
 
-      // Initial state - checked with [ci skip]
-      expect(checkbox).toBeChecked();
+      // Initial state - unchecked without [ci skip]
+      expect(checkbox).not.toBeChecked();
       expect(input).toHaveValue(
-        "[ci skip] Merge pull request #123 from user/branch",
+        "Merge pull request #123 from user/branch",
       );
 
-      // Uncheck - removes [ci skip]
-      await user.click(checkbox);
-      expect(checkbox).not.toBeChecked();
-      expect(input).toHaveValue("Merge pull request #123 from user/branch");
-
-      // Check again - adds [ci skip] back
+      // Check - adds [ci skip]
       await user.click(checkbox);
       expect(checkbox).toBeChecked();
+      expect(input).toHaveValue("[ci skip] Merge pull request #123 from user/branch");
+
+      // Uncheck again - removes [ci skip]
+      await user.click(checkbox);
+      expect(checkbox).not.toBeChecked();
       expect(input).toHaveValue(
-        "[ci skip] Merge pull request #123 from user/branch",
+        "Merge pull request #123 from user/branch",
       );
     });
 
@@ -121,13 +122,13 @@ describe("Content Script", () => {
       const checkbox = screen.getByRole("checkbox");
 
       // Initial state
-      expect(checkbox).toBeChecked();
+      expect(checkbox).not.toBeChecked();
 
       // Click the button (not the checkbox directly)
       await user.click(button);
 
       // Should toggle the checkbox
-      expect(checkbox).not.toBeChecked();
+      expect(checkbox).toBeChecked();
     });
 
     it("should work with different selector strategies", () => {
@@ -137,7 +138,7 @@ describe("Content Script", () => {
 
       const input = screen.getByLabelText("Commit message") as HTMLInputElement;
       expect(input).toHaveValue(
-        "[ci skip] Merge pull request #123 from user/branch",
+        "Merge pull request #123 from user/branch",
       );
 
       // Clean up for next test
@@ -151,7 +152,7 @@ describe("Content Script", () => {
         'input[data-component="input"]',
       ) as HTMLInputElement;
       expect(inputNoLabel).toHaveValue(
-        "[ci skip] Merge pull request #123 from user/branch",
+        "Merge pull request #123 from user/branch",
       );
     });
   });
@@ -173,7 +174,7 @@ describe("Content Script", () => {
       // Verify appender was called by checking its effects
       const input = screen.getByLabelText("Commit message") as HTMLInputElement;
       expect(input).toHaveValue(
-        "[ci skip] Merge pull request #123 from user/branch",
+        "Merge pull request #123 from user/branch",
       );
     });
 
@@ -240,10 +241,10 @@ describe("Content Script", () => {
         expect(checkbox).toBeInTheDocument();
       });
 
-      // Verify the input was updated
+      // Verify the input was NOT automatically updated
       const input = screen.getByLabelText("Commit message") as HTMLInputElement;
       expect(input).toHaveValue(
-        "[ci skip] Merge pull request #123 from user/branch",
+        "Merge pull request #123 from user/branch",
       );
     });
 

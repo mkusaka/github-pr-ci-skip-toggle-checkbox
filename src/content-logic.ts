@@ -127,7 +127,7 @@ export const appender = () => {
       "skip_ci_checkbox",
     ) as HTMLInputElement | null;
     if (maybeCheckboxDom) {
-      maybeCheckboxDom.checked = true;
+      // Don't change the existing checkbox state
       return;
     }
 
@@ -135,7 +135,7 @@ export const appender = () => {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.id = "skip_ci_checkbox";
-    checkbox.checked = true;
+    checkbox.checked = false;  // Default to unchecked - user chooses when to add [ci skip]
     checkbox.onchange = (checked) => {
       if ((checked.currentTarget as HTMLInputElement).checked) {
         // Remove any existing [ci skip] or [skip ci] tags
@@ -246,11 +246,7 @@ export const appender = () => {
       }
     }
 
-    // Add [ci skip] at the beginning if not already present
-    const alreadyCiSkip = /^\[ci skip\]|^\[skip ci\]/i.test(prTitleField.value);
-    if (!alreadyCiSkip) {
-      setInputValueAndDispatch(prTitleField, `[ci skip] ${prTitleField.value}`);
-    }
+    // Don't automatically add [ci skip] - let the user decide via checkbox
   }
 };
 
