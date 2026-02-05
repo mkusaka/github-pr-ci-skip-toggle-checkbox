@@ -192,7 +192,9 @@ export const appender = () => {
     const confirmBtn = Array.from(document.querySelectorAll("button")).find(
       (btn: HTMLButtonElement) => {
         const text = btn.textContent?.trim() || "";
-        return text.startsWith("Confirm") && text.toLowerCase().includes("merge");
+        return (
+          text.startsWith("Confirm") && text.toLowerCase().includes("merge")
+        );
       },
     );
 
