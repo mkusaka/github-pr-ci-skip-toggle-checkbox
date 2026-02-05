@@ -127,6 +127,60 @@ describe("Content Script", () => {
       expect(checkbox).toBeChecked();
     });
 
+    it("should show button with PRC-style DOM without auto-adding [ci skip]", () => {
+      const { getCommitInput } = setupGitHubPRPage({ prcStyle: true });
+
+      appender();
+
+      const input = getCommitInput();
+      // Should remain unchanged - no automatic [ci skip] added
+      expect(input).toHaveValue("Merge pull request #123 from user/branch");
+
+      // Check button exists
+      const button = screen.getByRole("button", { name: /CI Skip/i });
+      expect(button).toBeInTheDocument();
+
+      // Check checkbox exists inside button and defaults to unchecked
+      const checkbox = screen.getByRole("checkbox");
+      expect(checkbox).toBeInTheDocument();
+      expect(checkbox).not.toBeChecked();
+    });
+
+    it("should work with 'Confirm bypass rules and merge' button text", () => {
+      setupGitHubPRPage({
+        prcStyle: true,
+        confirmButtonText: "Confirm bypass rules and merge",
+      });
+
+      appender();
+
+      // CI Skip button should be positioned after Cancel
+      const cancelButton = screen.getByRole("button", { name: "Cancel" });
+      const ciSkipButton = screen.getByRole("button", { name: /CI Skip/i });
+      const allButtons = screen.getAllByRole("button");
+      const cancelIndex = allButtons.indexOf(cancelButton);
+      const ciSkipIndex = allButtons.indexOf(ciSkipButton);
+      expect(ciSkipIndex).toBeGreaterThan(cancelIndex);
+    });
+
+    it("should work with 'Confirm squash and merge' button text", () => {
+      setupGitHubPRPage({
+        prcStyle: true,
+        confirmButtonText: "Confirm squash and merge",
+      });
+
+      appender();
+
+      const ciSkipButton = screen.getByRole("button", { name: /CI Skip/i });
+      expect(ciSkipButton).toBeInTheDocument();
+
+      const cancelButton = screen.getByRole("button", { name: "Cancel" });
+      const allButtons = screen.getAllByRole("button");
+      expect(allButtons.indexOf(ciSkipButton)).toBeGreaterThan(
+        allButtons.indexOf(cancelButton),
+      );
+    });
+
     it("should work with different selector strategies", () => {
       // Test with label-based selection
       createGitHubMergeDialog({ hasLabel: true });
