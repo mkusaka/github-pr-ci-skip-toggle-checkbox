@@ -30,17 +30,17 @@ pnpm install
 
 ### Scripts
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Build in watch mode for development |
-| `pnpm build` | Production build |
-| `pnpm test` | Run tests (watch mode) |
-| `pnpm test:run` | Run tests once |
-| `pnpm test:coverage` | Run tests with coverage |
-| `pnpm typecheck` | TypeScript type checking |
-| `pnpm lint` | Lint with oxlint |
-| `pnpm format` | Format with Prettier |
-| `pnpm package` | Build and create `package.zip` for Chrome Web Store upload |
+| Command              | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| `pnpm dev`           | Build in watch mode for development                        |
+| `pnpm build`         | Production build                                           |
+| `pnpm test`          | Run tests (watch mode)                                     |
+| `pnpm test:run`      | Run tests once                                             |
+| `pnpm test:coverage` | Run tests with coverage                                    |
+| `pnpm typecheck`     | TypeScript type checking                                   |
+| `pnpm lint`          | Lint with oxlint                                           |
+| `pnpm format`        | Format with Prettier                                       |
+| `pnpm package`       | Build and create `package.zip` for Chrome Web Store upload |
 
 ### Loading the Extension Locally
 
