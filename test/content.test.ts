@@ -299,7 +299,7 @@ describe("Content Script", () => {
         configurable: true,
       });
 
-      const setTimeoutSpy = vi.spyOn(global, "setTimeout");
+      const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
 
       setupObserver();
 
