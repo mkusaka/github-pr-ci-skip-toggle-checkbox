@@ -7,7 +7,7 @@ blockExoticSubdeps: true
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
-  # Renovate security update: vite@8.0.16
-  - vite@8.0.16
+  # Renovate security update: vite@8.0.16 || 8.1.6
+  - vite@8.0.16 || 8.1.6
   # Renovate security update: vitest@4.1.11
   - vitest@4.1.11
